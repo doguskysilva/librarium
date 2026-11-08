@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[Fillable(['name', 'biography'])]
 class Author extends Model
@@ -17,4 +18,9 @@ class Author extends Model
     protected $keyType = 'string';
 
     public $incrementing = false;
+
+    public function books(): BelongsToMany
+    {
+        return $this->belongsToMany(Book::class)->withTimestamps();
+    }
 }
