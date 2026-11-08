@@ -19,7 +19,7 @@ class AuthorFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'biography' => null,
+            'biography' => fake()->optional()->paragraphs(2, true),
         ];
     }
 }

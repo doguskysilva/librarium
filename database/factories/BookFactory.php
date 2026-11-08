@@ -19,14 +19,14 @@ class BookFactory extends Factory
     {
         return [
             'title' => fake()->sentence(4),
-            'subtitle' => null,
-            'isbn' => null,
-            'publisher' => fake()->company(),
-            'edition' => null,
-            'publication_year' => fake()->numberBetween(1900, now()->year),
-            'language' => 'en',
-            'description' => null,
-            'cover_path' => null,
+            'subtitle' => fake()->optional()->sentence(3),
+            'isbn' => fake()->optional()->numerify('978#############'),
+            'publisher' => fake()->optional()->company(),
+            'edition' => fake()->optional()->randomElement(['1st edition', '2nd edition', 'Revised edition']),
+            'publication_year' => fake()->optional()->numberBetween(1900, now()->year),
+            'language' => fake()->optional()->randomElement(['en', 'pt-BR', 'es', 'fr']),
+            'description' => fake()->optional()->paragraph(),
+            'cover_path' => fake()->optional()->regexify('covers/[a-z0-9]{12}\.jpg'),
         ];
     }
 }
