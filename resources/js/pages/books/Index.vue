@@ -33,7 +33,7 @@ defineProps<{
 <template>
     <Head title="Books" />
 
-    <div class="flex max-w-5xl flex-col gap-6">
+    <div class="flex w-full max-w-5xl flex-col gap-6 p-6 md:p-8">
         <div class="flex items-start justify-between gap-8 py-3">
             <div class="space-y-2">
                 <h1 class="text-2xl font-semibold tracking-tight">Books</h1>
