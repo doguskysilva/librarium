@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { BookOpen, FolderGit2, LayoutGrid, UserRound } from '@lucide/vue';
+import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -28,6 +29,11 @@ const mainNavItems: NavItem[] = [
         title: 'Books',
         href: BookController.index.url(),
         icon: BookOpen,
+    },
+    {
+        title: 'Authors',
+        href: AuthorController.index.url(),
+        icon: UserRound,
     },
 ];
 

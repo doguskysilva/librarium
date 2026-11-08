@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from '@lucide/vue';
+import {
+    BookOpen,
+    Folder,
+    LayoutGrid,
+    Menu,
+    Search,
+    UserRound,
+} from '@lucide/vue';
 import { computed } from 'vue';
+import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
@@ -64,6 +72,11 @@ const mainNavItems: NavItem[] = [
         title: 'Books',
         href: BookController.index.url(),
         icon: BookOpen,
+    },
+    {
+        title: 'Authors',
+        href: AuthorController.index.url(),
+        icon: UserRound,
     },
 ];
 
