@@ -22,7 +22,7 @@ defineProps<{ book: Book }>();
 <template>
     <Head :title="book.title" />
 
-    <div class="flex max-w-3xl flex-col gap-6">
+    <div class="flex max-w-3xl flex-col gap-6 p-4">
         <div class="flex items-start justify-between gap-4">
             <Heading
                 variant="small"

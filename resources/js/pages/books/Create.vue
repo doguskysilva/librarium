@@ -21,7 +21,7 @@ defineOptions({
 <template>
     <Head title="Add book" />
 
-    <div class="flex max-w-3xl flex-col gap-6">
+    <div class="flex max-w-3xl flex-col gap-6 p-4">
         <Heading
             variant="small"
             title="Add book"

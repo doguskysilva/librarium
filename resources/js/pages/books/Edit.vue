@@ -31,7 +31,7 @@ defineOptions({
 <template>
     <Head :title="`Edit ${book.title}`" />
 
-    <div class="flex max-w-3xl flex-col gap-6">
+    <div class="flex max-w-3xl flex-col gap-6 p-4">
         <Heading variant="small" title="Edit book" :description="book.title" />
 
         <Form
