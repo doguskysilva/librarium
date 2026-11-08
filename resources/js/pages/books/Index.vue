@@ -34,8 +34,8 @@ defineProps<{
 <template>
     <Head title="Books" />
 
-    <div class="flex flex-col gap-6">
-        <div class="flex items-start justify-between gap-4">
+    <div class="flex max-w-5xl flex-col gap-6">
+        <div class="flex items-center justify-between gap-6">
             <Heading
                 variant="small"
                 title="Books"
@@ -49,16 +49,19 @@ defineProps<{
             </Link>
         </div>
 
-        <div v-if="books.data.length" class="grid gap-4 md:grid-cols-2">
+        <div
+            v-if="books.data.length"
+            class="overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
+        >
             <article
                 v-for="book in books.data"
                 :key="book.id"
-                class="flex flex-col gap-4 rounded-xl border border-sidebar-border/70 p-5 dark:border-sidebar-border"
+                class="flex items-center justify-between gap-6 border-b border-sidebar-border/70 px-6 py-5 last:border-b-0 hover:bg-muted/30 dark:border-sidebar-border"
             >
-                <div class="flex flex-col gap-1">
+                <div class="min-w-0 space-y-1">
                     <Link
                         :href="BookController.show.url(book.id)"
-                        class="font-medium hover:underline"
+                        class="block truncate font-medium hover:underline"
                     >
                         {{ book.title }}
                     </Link>
@@ -79,23 +82,6 @@ defineProps<{
                                 .join(' · ') || 'No additional metadata'
                         }}
                     </p>
-                </div>
-
-                <div class="flex gap-3 text-sm">
-                    <Link
-                        :href="BookController.edit.url(book.id)"
-                        class="underline underline-offset-4"
-                    >
-                        Edit
-                    </Link>
-                    <Link
-                        :href="BookController.destroy.url(book.id)"
-                        method="delete"
-                        as="button"
-                        class="text-destructive underline underline-offset-4"
-                    >
-                        Delete
-                    </Link>
                 </div>
             </article>
         </div>
