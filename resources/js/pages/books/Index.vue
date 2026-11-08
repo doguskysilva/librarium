@@ -35,9 +35,10 @@ defineProps<{
     <Head title="Books" />
 
     <div class="flex max-w-5xl flex-col gap-6">
-        <div class="flex items-center justify-between gap-6">
+        <div class="flex items-center justify-between gap-8 py-2">
             <Heading
                 variant="small"
+                class="space-y-2"
                 title="Books"
                 description="Catalog the physical editions in your library"
             />
