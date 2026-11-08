@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, UserRound } from '@lucide/vue';
+import { BookOpen, FolderGit2, LayoutGrid, Tags, UserRound } from '@lucide/vue';
 import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
+import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -34,6 +35,11 @@ const mainNavItems: NavItem[] = [
         title: 'Authors',
         href: AuthorController.index.url(),
         icon: UserRound,
+    },
+    {
+        title: 'Categories',
+        href: CategoryController.index.url(),
+        icon: Tags,
     },
 ];
 

@@ -6,11 +6,13 @@ import {
     LayoutGrid,
     Menu,
     Search,
+    Tags,
     UserRound,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
+import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -77,6 +79,11 @@ const mainNavItems: NavItem[] = [
         title: 'Authors',
         href: AuthorController.index.url(),
         icon: UserRound,
+    },
+    {
+        title: 'Categories',
+        href: CategoryController.index.url(),
+        icon: Tags,
     },
 ];
 
