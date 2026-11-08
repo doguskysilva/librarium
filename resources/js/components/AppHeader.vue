@@ -13,6 +13,7 @@ import { computed } from 'vue';
 import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
 import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
+import CollectionController from '@/actions/App/Http/Controllers/CollectionController';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -84,6 +85,11 @@ const mainNavItems: NavItem[] = [
         title: 'Categories',
         href: CategoryController.index.url(),
         icon: Tags,
+    },
+    {
+        title: 'Collections',
+        href: CollectionController.index.url(),
+        icon: Folder,
     },
 ];
 
