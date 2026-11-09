@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryImportController;
 use App\Http\Controllers\ReadingController;
 use Illuminate\Support\Facades\Route;
+use Spatie\Health\Http\Controllers\HealthCheckResultsController;
 
 Route::inertia('/', 'Welcome')->name('home');
 
@@ -30,6 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('inventory/import/apply', [InventoryImportController::class, 'apply'])->name('inventory-import.apply');
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+
+    Route::get('health', HealthCheckResultsController::class);
 });
 
 require __DIR__.'/settings.php';
