@@ -88,20 +88,12 @@
     "$defs": {
         "reviewStatus": {
             "type": "string",
-            "enum": [
-                "needs_review",
-                "verified",
-                "rejected"
-            ]
+            "enum": ["needs_review", "verified", "rejected"]
         },
         "identifier": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "provider",
-                "type",
-                "value"
-            ],
+            "required": ["provider", "type", "value"],
             "properties": {
                 "provider": {
                     "type": "string",
@@ -116,10 +108,7 @@
                     "minLength": 1
                 },
                 "url": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "format": "uri"
                 }
             }
@@ -127,10 +116,7 @@
         "bookIdentifier": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "type",
-                "value"
-            ],
+            "required": ["type", "value"],
             "properties": {
                 "provider": {
                     "type": "string",
@@ -145,10 +131,7 @@
                     "minLength": 1
                 },
                 "url": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "format": "uri"
                 }
             }
@@ -168,10 +151,7 @@
                     "minLength": 1
                 },
                 "biography": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": ["string", "null"]
                 },
                 "external_identifiers": {
                     "type": "array",
@@ -187,11 +167,7 @@
         "category": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "name",
-                "description",
-                "review_status"
-            ],
+            "required": ["name", "description", "review_status"],
             "properties": {
                 "name": {
                     "type": "string",
@@ -203,10 +179,7 @@
                     "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
                 },
                 "description": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": ["string", "null"]
                 },
                 "review_status": {
                     "$ref": "#/$defs/reviewStatus"
@@ -216,20 +189,14 @@
         "collectionMember": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "book_source_key",
-                "position"
-            ],
+            "required": ["book_source_key", "position"],
             "properties": {
                 "book_source_key": {
                     "type": "string",
                     "minLength": 1
                 },
                 "position": {
-                    "type": [
-                        "integer",
-                        "null"
-                    ],
+                    "type": ["integer", "null"],
                     "minimum": 1
                 }
             }
@@ -262,10 +229,7 @@
                     ]
                 },
                 "description": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": ["string", "null"]
                 },
                 "members": {
                     "type": "array",
@@ -281,11 +245,7 @@
         "bookCollection": {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-                "name",
-                "type",
-                "position"
-            ],
+            "required": ["name", "type", "position"],
             "properties": {
                 "name": {
                     "type": "string",
@@ -304,10 +264,7 @@
                     ]
                 },
                 "position": {
-                    "type": [
-                        "integer",
-                        "null"
-                    ],
+                    "type": ["integer", "null"],
                     "minimum": 1
                 }
             }
@@ -354,16 +311,10 @@
                     "minLength": 1
                 },
                 "provider_record_id": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": ["string", "null"]
                 },
                 "source_url": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "format": "uri"
                 },
                 "retrieved_at": {
@@ -373,18 +324,10 @@
                 "source_value": {},
                 "decision": {
                     "type": "string",
-                    "enum": [
-                        "proposed",
-                        "accepted",
-                        "rejected",
-                        "needs_review"
-                    ]
+                    "enum": ["proposed", "accepted", "rejected", "needs_review"]
                 },
                 "confidence": {
-                    "type": [
-                        "number",
-                        "null"
-                    ],
+                    "type": ["number", "null"],
                     "minimum": 0,
                     "maximum": 1
                 }
@@ -422,16 +365,10 @@
                     "minLength": 1
                 },
                 "subtitle": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": ["string", "null"]
                 },
                 "translator": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "maxLength": 255
                 },
                 "authors": {
@@ -439,9 +376,7 @@
                     "items": {
                         "type": "object",
                         "additionalProperties": false,
-                        "required": [
-                            "name"
-                        ],
+                        "required": ["name"],
                         "properties": {
                             "name": {
                                 "type": "string",
@@ -451,51 +386,30 @@
                     }
                 },
                 "isbn": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "maxLength": 20
                 },
                 "publisher": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": ["string", "null"]
                 },
                 "edition": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "maxLength": 100
                 },
                 "publication_year": {
-                    "type": [
-                        "integer",
-                        "null"
-                    ],
+                    "type": ["integer", "null"],
                     "minimum": 1,
                     "maximum": 32767
                 },
                 "language": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "maxLength": 10
                 },
                 "description": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
+                    "type": ["string", "null"]
                 },
                 "cover_url": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": ["string", "null"],
                     "format": "uri",
                     "maxLength": 2048
                 },
@@ -541,11 +455,7 @@
                             "minLength": 1
                         },
                         "confidence": {
-                            "type": [
-                                "string",
-                                "number",
-                                "null"
-                            ]
+                            "type": ["string", "number", "null"]
                         },
                         "verified_fields": {
                             "$ref": "#/$defs/reviewedFields"
@@ -554,10 +464,7 @@
                             "$ref": "#/$defs/reviewedFields"
                         },
                         "edition_notes": {
-                            "type": [
-                                "string",
-                                "null"
-                            ]
+                            "type": ["string", "null"]
                         }
                     }
                 },
@@ -566,11 +473,7 @@
                 },
                 "enrichment_status": {
                     "type": "string",
-                    "enum": [
-                        "pending",
-                        "enriched",
-                        "needs_review"
-                    ]
+                    "enum": ["pending", "enriched", "needs_review"]
                 }
             }
         }
