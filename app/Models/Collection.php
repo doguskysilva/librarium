@@ -20,6 +20,7 @@ class Collection extends Model
 
     public $incrementing = false;
 
+    /** @return BelongsToMany<Book, $this> */
     public function books(): BelongsToMany
     {
         return $this->belongsToMany(Book::class, 'collection_book', 'collection_id', 'book_id')

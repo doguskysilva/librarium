@@ -35,16 +35,19 @@ class Book extends Model
      */
     public $incrementing = false;
 
+    /** @return BelongsToMany<Author, $this> */
     public function authors(): BelongsToMany
     {
         return $this->belongsToMany(Author::class)->withTimestamps();
     }
 
+    /** @return BelongsToMany<Category, $this> */
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class)->withTimestamps();
     }
 
+    /** @return BelongsToMany<Collection, $this> */
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(Collection::class, 'collection_book', 'book_id', 'collection_id')
