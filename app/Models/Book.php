@@ -2,14 +2,20 @@
 
 namespace App\Models;
 
+use App\Support\Isbn;
 use Database\Factories\BookFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string|null $isbn
+ * @property-read string|null $canonical_isbn13
+ */
 #[Fillable([
     'title',
     'subtitle',
@@ -38,6 +44,26 @@ class Book extends Model
      * Indicate that the IDs are not auto-incrementing.
      */
     public $incrementing = false;
+
+    /** @return Attribute<string|null, string|null> */
+    protected function isbn(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value): ?string => $value !== null
+                ? (Isbn::toIsbn13($value) ?? $value)
+                : $value,
+        );
+    }
+
+    /** @return Attribute<string|null, never> */
+    protected function canonicalIsbn13(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): ?string => $this->isbn === null
+                ? null
+                : Isbn::toIsbn13($this->isbn),
+        );
+    }
 
     /** @return HasMany<Reading, $this> */
     public function readings(): HasMany
