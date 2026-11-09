@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
 import BookController from '@/actions/App/Http/Controllers/BookController';
+import BookMetadataLookupModal from '@/components/BookMetadataLookupModal.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 type BookFilters = {
+    q?: string;
     category?: string;
     language?: string;
     filter?: string;
@@ -15,6 +19,7 @@ type Book = {
     id: string;
     title: string;
     subtitle: string | null;
+    isbn: string | null;
     publisher: string | null;
     publication_year: number | null;
     language: string | null;
@@ -39,8 +44,15 @@ const props = defineProps<{
     filters: BookFilters;
 }>();
 
+const searchQuery = ref(props.filters.q ?? '');
+const metadataModalOpen = ref(false);
+
 const activeFilterLabels = computed(() => {
     const labels: string[] = [];
+
+    if (props.filters.q) {
+        labels.push(`Search: ${props.filters.q}`);
+    }
 
     if (props.filters.category) {
         labels.push('Category');
@@ -71,13 +83,31 @@ const activeFilterLabels = computed(() => {
 
     return labels;
 });
+
+function filterBooks() {
+    const query = searchQuery.value.trim();
+
+    router.get(
+        BookController.index.url({
+            query: query ? { q: query } : {},
+        }),
+        {},
+        { preserveScroll: true, preserveState: true },
+    );
+}
+
+function openMetadataLookup() {
+    metadataModalOpen.value = true;
+}
 </script>
 
 <template>
     <Head title="Books" />
 
     <div class="flex w-full max-w-5xl flex-col gap-6 p-4">
-        <div class="flex items-start justify-between gap-8 py-3">
+        <div
+            class="flex flex-col items-start justify-between gap-4 py-3 sm:flex-row sm:items-center"
+        >
             <div class="space-y-2">
                 <h1 class="text-2xl font-semibold tracking-tight">Books</h1>
                 <p class="text-sm text-muted-foreground">
@@ -96,13 +126,42 @@ const activeFilterLabels = computed(() => {
                     </Link>
                 </p>
             </div>
-            <Link
-                :href="BookController.create.url()"
-                class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-            >
-                Add book
-            </Link>
+            <div class="flex flex-wrap gap-2">
+                <Button variant="outline" @click="openMetadataLookup">
+                    Find by ISBN
+                </Button>
+                <Button as-child>
+                    <Link :href="BookController.create.url()">Add book</Link>
+                </Button>
+            </div>
         </div>
+
+        <form
+            class="flex flex-col gap-2 sm:flex-row"
+            role="search"
+            @submit.prevent="filterBooks"
+        >
+            <Input
+                v-model="searchQuery"
+                aria-label="Search books by title or ISBN"
+                placeholder="Search title or ISBN"
+                class="sm:max-w-sm"
+            />
+            <div class="flex gap-2">
+                <Button type="submit" variant="secondary">Search</Button>
+                <Button
+                    v-if="filters.q"
+                    type="button"
+                    variant="ghost"
+                    @click="
+                        searchQuery = '';
+                        filterBooks();
+                    "
+                >
+                    Clear search
+                </Button>
+            </div>
+        </form>
 
         <div
             v-if="books.data.length"
@@ -166,5 +225,7 @@ const activeFilterLabels = computed(() => {
                 v-html="link.label"
             />
         </nav>
+
+        <BookMetadataLookupModal v-model:open="metadataModalOpen" />
     </div>
 </template>

@@ -28,6 +28,29 @@ test('authenticated users can view the books index', function () {
             ->where('books.data.0.title', 'The Librarium Handbook'));
 });
 
+test('books index searches the catalog by title and ISBN', function () {
+    $user = User::factory()->create();
+    Book::factory()->create([
+        'title' => 'The 9781234567897 Handbook',
+        'isbn' => '9780000000000',
+    ]);
+    Book::factory()->create([
+        'title' => 'Another Handbook',
+        'isbn' => '9781234567897',
+    ]);
+    Book::factory()->create([
+        'title' => 'Unrelated Book',
+        'isbn' => '9780000000001',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('books.index', ['q' => '9781234567897']));
+
+    $response->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('books.data', 2)
+            ->where('filters.q', '9781234567897'));
+});
+
 test('authenticated users can create a book', function () {
     $user = User::factory()->create();
 

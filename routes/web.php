@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\BookMetadataController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\DashboardController;
@@ -14,6 +15,7 @@ Route::inertia('/', 'Welcome')->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('books', BookController::class);
+    Route::post('books/metadata/lookup', [BookMetadataController::class, 'lookup'])->name('books.metadata.lookup');
     Route::resource('books.readings', ReadingController::class)->only(['create', 'store']);
     Route::resource('readings', ReadingController::class)->only(['show', 'edit', 'update']);
     Route::post('readings/{reading}/start', [ReadingController::class, 'start'])->name('readings.start');
