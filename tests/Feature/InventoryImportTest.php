@@ -4,6 +4,8 @@ use App\Actions\Inventory\InventoryImporter;
 use App\Models\Author;
 use App\Models\Book;
 use App\Models\Collection as BookCollection;
+use App\Models\User;
+use Illuminate\Http\UploadedFile;
 
 function inventoryDocument(): array
 {
@@ -246,6 +248,29 @@ test('proposed metadata fields are excluded even when the book record is verifie
     ]);
 });
 
+test('verified translator fields and box set collections are imported', function () {
+    $document = inventoryDocument();
+    $document['collections'][0]['type'] = 'box_set';
+    $document['books'][0]['collections'][0]['type'] = 'box_set';
+    $document['books'][0]['translator'] = 'Example Translator';
+    $document['books'][0]['metadata_provenance'] = [
+        'verified_fields' => ['title', 'authors', 'translator'],
+    ];
+
+    $report = app(InventoryImporter::class)->run($document, apply: true);
+
+    expect($report['status'])->toBe('applied');
+
+    $this->assertDatabaseHas('books', [
+        'source_key' => 'inventory-001',
+        'translator' => 'Example Translator',
+    ]);
+    $this->assertDatabaseHas('collections', [
+        'name' => 'Analytical Engines',
+        'type' => 'box_set',
+    ]);
+});
+
 test('unknown JSON properties are rejected before writes', function () {
     $document = inventoryDocument();
     $document['unexpected'] = 'not part of inventory schema';
@@ -280,4 +305,99 @@ test('the artisan command writes a dry-run report without applying records', fun
         unlink($inventoryPath);
         unlink($reportPath);
     }
+});
+
+test('guests are redirected away from the inventory import page', function () {
+    $this->get(route('inventory-import.index'))
+        ->assertRedirect(route('login'));
+});
+
+test('authenticated users can open the inventory import page', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(route('inventory-import.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->component('inventory/Import'));
+});
+
+test('guests cannot submit an inventory import', function () {
+    $this->post(route('inventory-import.preview'), [
+        'file' => UploadedFile::fake()->createWithContent(
+            'inventory.json',
+            json_encode(inventoryDocument(), JSON_THROW_ON_ERROR),
+        ),
+    ])
+        ->assertRedirect(route('login'));
+
+    $this->assertDatabaseCount('books', 0);
+});
+
+test('the inventory import preview accepts JSON and makes no catalog changes', function () {
+    $this->actingAs(User::factory()->create());
+
+    $response = $this->post(route('inventory-import.preview'), [
+        'file' => UploadedFile::fake()->createWithContent(
+            'inventory.json',
+            json_encode(inventoryDocument(), JSON_THROW_ON_ERROR),
+        ),
+    ]);
+
+    $response->assertOk()
+        ->assertJsonPath('status', 'dry_run')
+        ->assertJsonPath('records.authors.0.action', 'create')
+        ->assertJsonPath('records.categories.0.action', 'create')
+        ->assertJsonPath('records.collections.0.action', 'create')
+        ->assertJsonPath('records.books.0.action', 'create')
+        ->assertJsonPath('records.collection_memberships.0.action', 'additive');
+    $this->assertDatabaseCount('books', 0);
+    $this->assertDatabaseCount('authors', 0);
+});
+
+test('the inventory import apply endpoint persists a complete verified inventory', function () {
+    $this->actingAs(User::factory()->create());
+
+    $response = $this->post(route('inventory-import.apply'), [
+        'file' => UploadedFile::fake()->createWithContent(
+            'inventory.json',
+            json_encode(inventoryDocument(), JSON_THROW_ON_ERROR),
+        ),
+    ]);
+
+    $response->assertOk()->assertJsonPath('status', 'applied');
+    $this->assertDatabaseHas('books', [
+        'source_key' => 'inventory-001',
+        'title' => 'Notes on the Analytical Engine',
+    ]);
+});
+
+test('the inventory import upload rejects malformed JSON', function () {
+    $this->actingAs(User::factory()->create());
+
+    $this->post(route('inventory-import.preview'), [
+        'file' => UploadedFile::fake()->createWithContent('inventory.json', '{invalid'),
+    ])
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.file.0', 'The selected file could not be parsed as JSON.');
+
+    $this->assertDatabaseCount('books', 0);
+});
+
+test('the inventory import preview ties validation errors to their book identity', function () {
+    $this->actingAs(User::factory()->create());
+    $document = inventoryDocument();
+    $document['books'][0]['title'] = '';
+
+    $this->post(route('inventory-import.preview'), [
+        'file' => UploadedFile::fake()->createWithContent(
+            'inventory.json',
+            json_encode($document, JSON_THROW_ON_ERROR),
+        ),
+    ])
+        ->assertOk()
+        ->assertJsonPath('status', 'invalid')
+        ->assertJsonPath('record_labels.books.0', 'inventory-001')
+        ->assertJsonFragment([
+            'books.0.title' => ['The books.0.title field is required.'],
+        ]);
+
+    $this->assertDatabaseCount('books', 0);
 });

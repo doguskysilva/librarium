@@ -11,6 +11,8 @@ A personal library management application.
 
 The versioned interchange contract is [librarium.inventory 1.0.0](schemas/librarium.inventory-1.0.0.schema.json). Keep the source JSON and its field provenance as separate artifacts; imports do not overwrite populated catalog fields or remove relationships.
 
+You can upload and review an inventory from the authenticated **Import inventory** page in the sidebar, or use the CLI below. Both options support a no-write preview before applying verified records, and show results and errors for each record.
+
 Validate and preview an inventory first:
 
 ```sh

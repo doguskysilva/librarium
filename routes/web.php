@@ -5,6 +5,7 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InventoryImportController;
 use App\Http\Controllers\ReadingController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,10 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('authors', AuthorController::class);
     Route::resource('categories', CategoryController::class);
     Route::resource('collections', CollectionController::class);
+
+    Route::get('inventory/import', [InventoryImportController::class, 'index'])->name('inventory-import.index');
+    Route::post('inventory/import/preview', [InventoryImportController::class, 'preview'])->name('inventory-import.preview');
+    Route::post('inventory/import/apply', [InventoryImportController::class, 'apply'])->name('inventory-import.apply');
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });

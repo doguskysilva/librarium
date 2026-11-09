@@ -10,4 +10,5 @@ enum CollectionType: string
     case AuthorBibliography = 'author_bibliography';
     case Thematic = 'thematic';
     case Personal = 'personal';
+    case BoxSet = 'box_set';
 }

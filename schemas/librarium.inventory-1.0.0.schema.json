@@ -252,7 +252,8 @@
                         "fictional_universe",
                         "author_bibliography",
                         "thematic",
-                        "personal"
+                        "personal",
+                        "box_set"
                     ]
                 },
                 "description": {
@@ -293,7 +294,8 @@
                         "fictional_universe",
                         "author_bibliography",
                         "thematic",
-                        "personal"
+                        "personal",
+                        "box_set"
                     ]
                 },
                 "position": {
@@ -314,6 +316,7 @@
                     "source_key",
                     "title",
                     "subtitle",
+                    "translator",
                     "authors",
                     "isbn",
                     "publisher",
@@ -418,6 +421,13 @@
                         "string",
                         "null"
                     ]
+                },
+                "translator": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "maxLength": 255
                 },
                 "authors": {
                     "type": "array",

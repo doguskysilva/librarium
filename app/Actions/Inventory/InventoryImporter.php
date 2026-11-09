@@ -412,9 +412,9 @@ class InventoryImporter
     {
         $attributes = ['source_key' => $record['source_key']];
 
-        foreach (['title', 'subtitle', 'isbn', 'publisher', 'edition', 'publication_year', 'language', 'description', 'cover_url'] as $field) {
+        foreach (['title', 'subtitle', 'translator', 'isbn', 'publisher', 'edition', 'publication_year', 'language', 'description', 'cover_url'] as $field) {
             if ($this->isFieldVerified($record, $field)) {
-                $attributes[$field] = $record[$field];
+                $attributes[$field] = $record[$field] ?? null;
             }
         }
 
@@ -863,7 +863,7 @@ class InventoryImporter
         }
 
         return array_values(array_diff(
-            ['subtitle', 'authors', 'isbn', 'publisher', 'edition', 'publication_year', 'language', 'description', 'cover_url', 'categories', 'collections', 'identifiers'],
+            ['subtitle', 'translator', 'authors', 'isbn', 'publisher', 'edition', 'publication_year', 'language', 'description', 'cover_url', 'categories', 'collections', 'identifiers'],
             $verifiedFields,
         ));
     }

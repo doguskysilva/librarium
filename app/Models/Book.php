@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable([
     'title',
     'subtitle',
+    'translator',
     'isbn',
     'publisher',
     'edition',
