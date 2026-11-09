@@ -1,9 +1,6 @@
-name: tests
+name: Run tests
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
   workflow_call:
 

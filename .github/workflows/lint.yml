@@ -1,9 +1,6 @@
-name: lint
+name: Run lint checks
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
   workflow_call:
 
