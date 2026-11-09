@@ -8,6 +8,7 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
 use App\Models\Collection;
+use App\Support\Isbn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,9 +43,16 @@ class BookController extends Controller
             ->when(
                 $filters['q'] ?? null,
                 fn (Builder $query, string $search) => $query->where(
-                    fn (Builder $books) => $books
-                        ->where('title', 'like', '%'.$search.'%')
-                        ->orWhere('isbn', 'like', '%'.$search.'%'),
+                    function (Builder $books) use ($search): void {
+                        $books->where('title', 'like', '%'.$search.'%');
+
+                        foreach (Isbn::equivalents($search) as $isbn) {
+                            $books->orWhereRaw(
+                                "REPLACE(REPLACE(UPPER(isbn), '-', ''), ' ', '') LIKE ?",
+                                ['%'.$isbn.'%'],
+                            );
+                        }
+                    },
                 ),
             )
             ->when(

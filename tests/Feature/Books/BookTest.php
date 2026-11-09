@@ -51,6 +51,28 @@ test('books index searches the catalog by title and ISBN', function () {
             ->where('filters.q', '9781234567897'));
 });
 
+test('books index finds an ISBN-10 edition when searching with its ISBN-13', function () {
+    $user = User::factory()->create();
+    Book::factory()->create([
+        'title' => 'ISBN-10 Edition',
+        'isbn' => '0-306-40615-2',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('books.index', ['q' => '9780306406157']));
+
+    $response->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('books.data', 1)
+            ->where('books.data.0.title', 'ISBN-10 Edition'));
+});
+
+test('book exposes its canonical ISBN-13 when a valid ISBN is stored', function () {
+    $book = Book::factory()->make(['isbn' => '0-306-40615-2']);
+
+    expect($book->isbn)->toBe('9780306406157')
+        ->and($book->canonical_isbn13)->toBe('9780306406157');
+});
+
 test('authenticated users can create a book', function () {
     $user = User::factory()->create();
 
@@ -58,7 +80,7 @@ test('authenticated users can create a book', function () {
         ->actingAs($user)
         ->post(route('books.store'), [
             'title' => 'The Librarium Handbook',
-            'isbn' => '9781234567890',
+            'isbn' => '0-306-40615-2',
             'publication_year' => 2026,
             'language' => 'en',
         ]);
@@ -73,8 +95,24 @@ test('authenticated users can create a book', function () {
     $this->assertDatabaseHas('books', [
         'id' => $book->id,
         'title' => 'The Librarium Handbook',
-        'isbn' => '9781234567890',
+        'isbn' => '9780306406157',
     ]);
+});
+
+test('book creation rejects an ISBN with an invalid check digit', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)
+        ->from(route('books.create'))
+        ->post(route('books.store'), [
+            'title' => 'Invalid ISBN Book',
+            'isbn' => '9780306406158',
+        ]);
+
+    $response->assertSessionHasErrors('isbn')
+        ->assertRedirect(route('books.create'));
+
+    $this->assertDatabaseCount('books', 0);
 });
 
 test('book creation requires a title', function () {
@@ -159,6 +197,23 @@ test('authenticated users can update a book', function () {
         'id' => $book->id,
         'title' => 'Published title',
         'language' => 'pt-BR',
+    ]);
+});
+
+test('book updates normalize a valid ISBN-10 to ISBN-13', function () {
+    $user = User::factory()->create();
+    $book = Book::factory()->create(['isbn' => '9780306406157']);
+
+    $response = $this->actingAs($user)
+        ->put(route('books.update', $book), [
+            'title' => $book->title,
+            'isbn' => '0-306-40615-2',
+        ]);
+
+    $response->assertSessionHasNoErrors();
+    $this->assertDatabaseHas('books', [
+        'id' => $book->id,
+        'isbn' => '9780306406157',
     ]);
 });
 

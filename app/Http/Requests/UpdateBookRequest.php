@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ValidIsbn;
+use App\Support\Isbn;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateBookRequest extends FormRequest
@@ -14,17 +16,24 @@ class UpdateBookRequest extends FormRequest
         return $this->user() !== null;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'isbn' => Isbn::normalizeInput($this->input('isbn')),
+        ]);
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
         return [
             'title' => ['required', 'string', 'max:255'],
             'subtitle' => ['nullable', 'string', 'max:255'],
-            'isbn' => ['nullable', 'string', 'max:20'],
+            'isbn' => ['nullable', 'string', 'max:20', new ValidIsbn],
             'publisher' => ['nullable', 'string', 'max:255'],
             'edition' => ['nullable', 'string', 'max:100'],
             'publication_year' => ['nullable', 'integer', 'min:1000', 'max:'.now()->year],

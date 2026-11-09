@@ -95,6 +95,26 @@ it('returns a not-found result for each source when neither has a match', functi
     Http::assertSentCount(2);
 });
 
+it('queries providers using ISBN-13 when given an ISBN-10', function () {
+    $user = User::factory()->create();
+
+    Http::preventStrayRequests();
+    Http::fake([
+        'www.googleapis.com/books/v1/volumes*' => Http::response(['totalItems' => 0]),
+        'openlibrary.org/search.json*' => Http::response(['docs' => []]),
+    ]);
+
+    $response = $this->actingAs($user)->postJson(route('books.metadata.lookup'), [
+        'isbn' => '0-306-40615-2',
+    ]);
+
+    $response->assertOk();
+    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'googleapis.com')
+        && $request['q'] === 'isbn:9780306406157');
+    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'openlibrary.org')
+        && $request['isbn'] === '9780306406157');
+});
+
 it('does not claim the requested ISBN when a provider omits its identifiers', function () {
     $user = User::factory()->create();
 
@@ -158,6 +178,22 @@ it('rejects invalid ISBN input without querying providers', function () {
 
     $response = $this->actingAs($user)->postJson(route('books.metadata.lookup'), [
         'isbn' => 'not-an-isbn',
+    ]);
+
+    $response->assertUnprocessable()
+        ->assertJsonValidationErrors('isbn');
+
+    Http::assertNothingSent();
+});
+
+it('rejects ISBN values with an invalid check digit', function () {
+    $user = User::factory()->create();
+
+    Http::preventStrayRequests();
+    Http::fake();
+
+    $response = $this->actingAs($user)->postJson(route('books.metadata.lookup'), [
+        'isbn' => '9780306406158',
     ]);
 
     $response->assertUnprocessable()
