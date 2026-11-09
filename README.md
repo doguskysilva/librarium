@@ -9,7 +9,7 @@ A personal library catalog for keeping track of books and organizing an existing
 
 ## About the name
 
-*Librarium* evokes a library: a place to gather and care for books. The project focuses on making a personal catalog easy to maintain, browse, and import—not on enforcing a complex bibliographic workflow.
+_Librarium_ evokes a library: a place to gather and care for books. The project focuses on making a personal catalog easy to maintain, browse, and import—not on enforcing a complex bibliographic workflow.
 
 ## Local setup
 
