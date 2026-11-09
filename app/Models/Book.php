@@ -20,6 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'language',
     'description',
     'cover_path',
+    'cover_url',
+    'source_key',
 ])]
 class Book extends Model
 {
@@ -40,6 +42,12 @@ class Book extends Model
     public function readings(): HasMany
     {
         return $this->hasMany(Reading::class);
+    }
+
+    /** @return HasMany<BookExternalIdentifier, $this> */
+    public function externalIdentifiers(): HasMany
+    {
+        return $this->hasMany(BookExternalIdentifier::class);
     }
 
     /** @return BelongsToMany<Author, $this> */
