@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'title',
@@ -34,6 +35,12 @@ class Book extends Model
      * Indicate that the IDs are not auto-incrementing.
      */
     public $incrementing = false;
+
+    /** @return HasMany<Reading, $this> */
+    public function readings(): HasMany
+    {
+        return $this->hasMany(Reading::class);
+    }
 
     /** @return BelongsToMany<Author, $this> */
     public function authors(): BelongsToMany

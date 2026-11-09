@@ -4,6 +4,7 @@ import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
 import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
 import CollectionController from '@/actions/App/Http/Controllers/CollectionController';
+import ReadingController from '@/actions/App/Http/Controllers/ReadingController';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 
@@ -20,11 +21,21 @@ type Book = {
     authors: Relation[];
     categories: Relation[];
     collections: Relation[];
+    readings: Reading[];
 };
 
 type Relation = {
     id: string;
     name: string;
+};
+
+type Reading = {
+    id: string;
+    status: string;
+    started_on: string | null;
+    started_year: number | null;
+    finished_on: string | null;
+    finished_year: number | null;
 };
 
 defineProps<{ book: Book }>();
@@ -40,9 +51,16 @@ defineProps<{ book: Book }>();
                 :title="book.title"
                 :description="book.subtitle ?? undefined"
             />
-            <Button as-child>
-                <Link :href="BookController.edit.url(book.id)">Edit</Link>
-            </Button>
+            <div class="flex gap-2">
+                <Button as-child variant="outline">
+                    <Link :href="ReadingController.create.url(book.id)"
+                        >Add reading</Link
+                    >
+                </Button>
+                <Button as-child>
+                    <Link :href="BookController.edit.url(book.id)">Edit</Link>
+                </Button>
+            </div>
         </div>
 
         <dl class="grid gap-4 rounded-xl border p-6 sm:grid-cols-2">
@@ -147,5 +165,53 @@ defineProps<{ book: Book }>();
                 </p>
             </section>
         </div>
+
+        <section class="grid gap-4 rounded-xl border p-6">
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-medium">Reading history</h2>
+                    <p class="text-sm text-muted-foreground">
+                        Track each attempt separately, including rereads.
+                    </p>
+                </div>
+                <Button as-child size="sm">
+                    <Link :href="ReadingController.create.url(book.id)"
+                        >New reading</Link
+                    >
+                </Button>
+            </div>
+
+            <div v-if="book.readings.length" class="grid gap-3">
+                <Link
+                    v-for="reading in book.readings"
+                    :key="reading.id"
+                    :href="ReadingController.show.url(reading.id)"
+                    class="flex items-center justify-between gap-4 rounded-lg border p-4 hover:bg-muted/50"
+                >
+                    <span>
+                        <span class="block font-medium capitalize">{{
+                            reading.status
+                        }}</span>
+                        <span class="text-sm text-muted-foreground">
+                            {{
+                                reading.started_on ??
+                                reading.started_year ??
+                                'Start unknown'
+                            }}
+                            ·
+                            {{
+                                reading.finished_on ??
+                                reading.finished_year ??
+                                'Open-ended'
+                            }}
+                        </span>
+                    </span>
+                    <span class="text-sm text-muted-foreground">View</span>
+                </Link>
+            </div>
+            <p v-else class="text-sm text-muted-foreground">
+                No reading attempts yet.
+            </p>
+        </section>
     </div>
 </template>

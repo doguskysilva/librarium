@@ -38,7 +38,12 @@ class BookController extends Controller
 
     public function show(Book $book): Response
     {
-        $book->load(['authors', 'categories', 'collections']);
+        $book->load([
+            'authors',
+            'categories',
+            'collections',
+            'readings' => fn ($query) => $query->latest(),
+        ]);
 
         return Inertia::render('books/Show', [
             'book' => $book,
