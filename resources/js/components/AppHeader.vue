@@ -1,7 +1,19 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from '@lucide/vue';
+import {
+    BookOpen,
+    Folder,
+    LayoutGrid,
+    Menu,
+    Search,
+    Tags,
+    UserRound,
+} from '@lucide/vue';
 import { computed } from 'vue';
+import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
+import BookController from '@/actions/App/Http/Controllers/BookController';
+import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
+import CollectionController from '@/actions/App/Http/Controllers/CollectionController';
 import AppLogo from '@/components/AppLogo.vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -58,6 +70,26 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Books',
+        href: BookController.index.url(),
+        icon: BookOpen,
+    },
+    {
+        title: 'Authors',
+        href: AuthorController.index.url(),
+        icon: UserRound,
+    },
+    {
+        title: 'Categories',
+        href: CategoryController.index.url(),
+        icon: Tags,
+    },
+    {
+        title: 'Collections',
+        href: CollectionController.index.url(),
+        icon: Folder,
     },
 ];
 
