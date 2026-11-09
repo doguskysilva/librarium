@@ -9,4 +9,6 @@ enum CollectionType: string
     case FictionalUniverse = 'fictional_universe';
     case AuthorBibliography = 'author_bibliography';
     case Thematic = 'thematic';
+    case Personal = 'personal';
+    case BoxSet = 'box_set';
 }

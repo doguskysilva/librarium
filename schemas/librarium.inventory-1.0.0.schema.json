@@ -1,0 +1,481 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "urn:librarium:inventory:1.0.0",
+    "title": "Librarium inventory",
+    "description": "Portable inventory interchange format. Source provenance stays with the inventory artifact.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schema",
+        "schema_version",
+        "inventory",
+        "authors",
+        "categories",
+        "collections",
+        "books"
+    ],
+    "properties": {
+        "schema": {
+            "const": "librarium.inventory"
+        },
+        "schema_version": {
+            "const": "1.0.0"
+        },
+        "inventory": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "language",
+                "created_at",
+                "source",
+                "is_complete",
+                "notes"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "language": {
+                    "type": "string",
+                    "minLength": 2
+                },
+                "created_at": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "source": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "is_complete": {
+                    "type": "boolean"
+                },
+                "notes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "authors": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/author"
+            }
+        },
+        "categories": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/category"
+            }
+        },
+        "collections": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/collection"
+            }
+        },
+        "books": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/book"
+            }
+        }
+    },
+    "$defs": {
+        "reviewStatus": {
+            "type": "string",
+            "enum": ["needs_review", "verified", "rejected"]
+        },
+        "identifier": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["provider", "type", "value"],
+            "properties": {
+                "provider": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "type": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "value": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "url": {
+                    "type": ["string", "null"],
+                    "format": "uri"
+                }
+            }
+        },
+        "bookIdentifier": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "value"],
+            "properties": {
+                "provider": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "type": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "value": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "url": {
+                    "type": ["string", "null"],
+                    "format": "uri"
+                }
+            }
+        },
+        "author": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "biography",
+                "external_identifiers",
+                "review_status"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "biography": {
+                    "type": ["string", "null"]
+                },
+                "external_identifiers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/identifier"
+                    }
+                },
+                "review_status": {
+                    "$ref": "#/$defs/reviewStatus"
+                }
+            }
+        },
+        "category": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "description", "review_status"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "slug": {
+                    "type": "string",
+                    "maxLength": 120,
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                },
+                "description": {
+                    "type": ["string", "null"]
+                },
+                "review_status": {
+                    "$ref": "#/$defs/reviewStatus"
+                }
+            }
+        },
+        "collectionMember": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["book_source_key", "position"],
+            "properties": {
+                "book_source_key": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "position": {
+                    "type": ["integer", "null"],
+                    "minimum": 1
+                }
+            }
+        },
+        "collection": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "type",
+                "description",
+                "members",
+                "review_status"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "editorial",
+                        "literary_series",
+                        "fictional_universe",
+                        "author_bibliography",
+                        "thematic",
+                        "personal",
+                        "box_set"
+                    ]
+                },
+                "description": {
+                    "type": ["string", "null"]
+                },
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/collectionMember"
+                    }
+                },
+                "review_status": {
+                    "$ref": "#/$defs/reviewStatus"
+                }
+            }
+        },
+        "bookCollection": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "type", "position"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "editorial",
+                        "literary_series",
+                        "fictional_universe",
+                        "author_bibliography",
+                        "thematic",
+                        "personal",
+                        "box_set"
+                    ]
+                },
+                "position": {
+                    "type": ["integer", "null"],
+                    "minimum": 1
+                }
+            }
+        },
+        "reviewedFields": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "enum": [
+                    "source_key",
+                    "title",
+                    "subtitle",
+                    "translator",
+                    "authors",
+                    "isbn",
+                    "publisher",
+                    "edition",
+                    "publication_year",
+                    "language",
+                    "description",
+                    "cover_url",
+                    "categories",
+                    "collections",
+                    "identifiers"
+                ]
+            }
+        },
+        "provenance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "provider",
+                "provider_record_id",
+                "source_url",
+                "retrieved_at",
+                "source_value",
+                "decision",
+                "confidence"
+            ],
+            "properties": {
+                "provider": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "provider_record_id": {
+                    "type": ["string", "null"]
+                },
+                "source_url": {
+                    "type": ["string", "null"],
+                    "format": "uri"
+                },
+                "retrieved_at": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "source_value": {},
+                "decision": {
+                    "type": "string",
+                    "enum": ["proposed", "accepted", "rejected", "needs_review"]
+                },
+                "confidence": {
+                    "type": ["number", "null"],
+                    "minimum": 0,
+                    "maximum": 1
+                }
+            }
+        },
+        "book": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "source_key",
+                "title",
+                "subtitle",
+                "authors",
+                "isbn",
+                "publisher",
+                "edition",
+                "publication_year",
+                "language",
+                "description",
+                "cover_url",
+                "categories",
+                "collections",
+                "identifiers",
+                "metadata_provenance",
+                "review_status",
+                "enrichment_status"
+            ],
+            "properties": {
+                "source_key": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+                },
+                "title": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "subtitle": {
+                    "type": ["string", "null"]
+                },
+                "translator": {
+                    "type": ["string", "null"],
+                    "maxLength": 255
+                },
+                "authors": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["name"],
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "minLength": 1
+                            }
+                        }
+                    }
+                },
+                "isbn": {
+                    "type": ["string", "null"],
+                    "maxLength": 20
+                },
+                "publisher": {
+                    "type": ["string", "null"]
+                },
+                "edition": {
+                    "type": ["string", "null"],
+                    "maxLength": 100
+                },
+                "publication_year": {
+                    "type": ["integer", "null"],
+                    "minimum": 1,
+                    "maximum": 32767
+                },
+                "language": {
+                    "type": ["string", "null"],
+                    "maxLength": 10
+                },
+                "description": {
+                    "type": ["string", "null"]
+                },
+                "cover_url": {
+                    "type": ["string", "null"],
+                    "format": "uri",
+                    "maxLength": 2048
+                },
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "uniqueItems": true
+                },
+                "collections": {
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            {
+                                "$ref": "#/$defs/bookCollection"
+                            }
+                        ]
+                    }
+                },
+                "identifiers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/bookIdentifier"
+                    }
+                },
+                "metadata_provenance": {
+                    "type": "object",
+                    "propertyNames": {
+                        "pattern": "^[a-z][a-z0-9_]*$"
+                    },
+                    "additionalProperties": {
+                        "$ref": "#/$defs/provenance"
+                    },
+                    "properties": {
+                        "provider": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "confidence": {
+                            "type": ["string", "number", "null"]
+                        },
+                        "verified_fields": {
+                            "$ref": "#/$defs/reviewedFields"
+                        },
+                        "proposed_fields": {
+                            "$ref": "#/$defs/reviewedFields"
+                        },
+                        "edition_notes": {
+                            "type": ["string", "null"]
+                        }
+                    }
+                },
+                "review_status": {
+                    "$ref": "#/$defs/reviewStatus"
+                },
+                "enrichment_status": {
+                    "type": "string",
+                    "enum": ["pending", "enriched", "needs_review"]
+                }
+            }
+        }
+    }
+}

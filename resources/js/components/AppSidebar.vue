@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid, Tags, UserRound } from '@lucide/vue';
+import {
+    BookOpen,
+    Folder,
+    LayoutGrid,
+    Tags,
+    Upload,
+    UserRound,
+} from '@lucide/vue';
 import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
 import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
@@ -18,6 +25,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as inventoryImport } from '@/routes/inventory-import';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -30,6 +38,11 @@ const mainNavItems: NavItem[] = [
         title: 'Books',
         href: BookController.index.url(),
         icon: BookOpen,
+    },
+    {
+        title: 'Import inventory',
+        href: inventoryImport.url(),
+        icon: Upload,
     },
     {
         title: 'Authors',
