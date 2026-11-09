@@ -8,17 +8,70 @@ use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
 use App\Models\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class BookController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        /** @var array{category?: string, language?: string, filter?: string, year_from?: int, year_to?: int} $filters */
+        $filters = $request->validate([
+            'category' => ['nullable', 'uuid', 'exists:categories,id'],
+            'language' => ['nullable', 'string', 'max:10'],
+            'filter' => ['nullable', 'in:missing_covers,unclassified,missing_isbn,missing_descriptions,unknown_language,unknown_year'],
+            'year_from' => ['nullable', 'integer', 'min:1', 'max:32767'],
+            'year_to' => ['nullable', 'integer', 'min:1', 'max:32767'],
+        ]);
+        if (isset($filters['year_from'])) {
+            $filters['year_from'] = (int) $filters['year_from'];
+        }
+        if (isset($filters['year_to'])) {
+            $filters['year_to'] = (int) $filters['year_to'];
+        }
+
+        $yearFrom = $filters['year_from'] ?? null;
+        $yearTo = $filters['year_to'] ?? null;
+
+        $books = Book::query()
+            ->when(
+                $filters['category'] ?? null,
+                fn (Builder $query, string $categoryId) => $query->whereHas(
+                    'categories',
+                    fn (Builder $categories) => $categories->whereKey($categoryId),
+                ),
+            )
+            ->when(
+                $filters['language'] ?? null,
+                fn (Builder $query, string $language) => $query->where('language', $language),
+            );
+
+        if ($yearFrom !== null) {
+            $books->where('publication_year', '>=', $yearFrom);
+        }
+        if ($yearTo !== null) {
+            $books->where('publication_year', '<=', $yearTo);
+        }
+
+        $books = match ($filters['filter'] ?? null) {
+            'missing_covers' => $books
+                ->where(fn (Builder $query) => $query->whereNull('cover_path')->orWhereRaw("TRIM(cover_path) = ''"))
+                ->where(fn (Builder $query) => $query->whereNull('cover_url')->orWhereRaw("TRIM(cover_url) = ''")),
+            'unclassified' => $books->doesntHave('categories'),
+            'missing_isbn' => $books->where(fn (Builder $query) => $query->whereNull('isbn')->orWhereRaw("TRIM(isbn) = ''")),
+            'missing_descriptions' => $books->where(fn (Builder $query) => $query->whereNull('description')->orWhereRaw("TRIM(description) = ''")),
+            'unknown_language' => $books->where(fn (Builder $query) => $query->whereNull('language')->orWhereRaw("TRIM(language) = ''")),
+            'unknown_year' => $books->whereNull('publication_year'),
+            default => $books,
+        };
+
         return Inertia::render('books/Index', [
-            'books' => Book::query()->latest()->paginate(12),
+            'books' => $books->latest()->paginate(12)->withQueryString(),
+            'filters' => $filters,
         ]);
     }
 

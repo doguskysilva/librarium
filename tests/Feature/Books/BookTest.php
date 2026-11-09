@@ -150,3 +150,108 @@ test('authenticated users can delete a book', function () {
     $response->assertRedirect(route('books.index'));
     $this->assertDatabaseMissing('books', ['id' => $book->id]);
 });
+
+test('books index applies catalog health filters', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $makeBook = function (string $title, array $attributes = [], bool $classified = true) use ($category): Book {
+        $book = Book::factory()->create(array_replace([
+            'title' => $title,
+            'isbn' => '9781234567890',
+            'description' => 'A description.',
+            'language' => 'en',
+            'publication_year' => 2000,
+            'cover_path' => 'covers/book.jpg',
+            'cover_url' => null,
+        ], $attributes));
+
+        if ($classified) {
+            $book->categories()->attach($category);
+        }
+
+        return $book;
+    };
+
+    $makeBook('Missing cover', ['cover_path' => null]);
+    $makeBook('Unclassified', [], classified: false);
+    $makeBook('Missing ISBN', ['isbn' => '']);
+    $makeBook('Missing description', ['description' => '   ']);
+    $makeBook('Unknown language', ['language' => null]);
+    $makeBook('Blank language', ['language' => '   ']);
+    $makeBook('Unknown year', ['publication_year' => null]);
+    $makeBook('Empty cover URL', ['cover_path' => null, 'cover_url' => '']);
+    $makeBook('Whitespace cover path', ['cover_path' => '   ']);
+    $makeBook('Has remote cover', ['cover_path' => null, 'cover_url' => 'https://example.test/cover.jpg']);
+
+    $this->actingAs($user);
+
+    foreach ([
+        ['missing_covers', 'Missing cover', 3],
+        ['unclassified', 'Unclassified', 1],
+        ['missing_isbn', 'Missing ISBN', 1],
+        ['missing_descriptions', 'Missing description', 1],
+        ['unknown_year', 'Unknown year', 1],
+    ] as [$filter, $title, $count]) {
+        $this->get(route('books.index', ['filter' => $filter]))
+            ->assertOk()
+            ->assertInertia(function ($page) use ($filter, $title, $count): void {
+                $page->component('books/Index')
+                    ->has('books.data', $count)
+                    ->where('filters.filter', $filter);
+
+                if ($count === 1) {
+                    $page->where('books.data.0.title', $title);
+                }
+            });
+    }
+
+    $this->get(route('books.index', ['filter' => 'unknown_language']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->has('books.data', 2));
+});
+
+test('books index filters by category, language, and inclusive year range', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $makeBook = function (string $title, array $attributes = [], bool $categorized = false) use ($category): Book {
+        $book = Book::factory()->create(array_replace([
+            'title' => $title,
+            'language' => 'en',
+            'publication_year' => 1965,
+        ], $attributes));
+
+        if ($categorized) {
+            $book->categories()->attach($category);
+        }
+
+        return $book;
+    };
+
+    $makeBook('Category match', categorized: true);
+    $makeBook('Category mismatch', ['publication_year' => 1959]);
+    $makeBook('Portuguese match', ['language' => 'pt-BR']);
+    $makeBook('Range lower bound', ['publication_year' => 1960]);
+    $makeBook('Range upper bound', ['publication_year' => 1969]);
+    $makeBook('Outside year range', ['publication_year' => 1970]);
+
+    $this->actingAs($user);
+
+    $this->get(route('books.index', ['category' => $category->id]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('books.data', 1)
+            ->where('books.data.0.title', 'Category match'));
+
+    $this->get(route('books.index', ['language' => 'pt-BR']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('books.data', 1)
+            ->where('books.data.0.title', 'Portuguese match'));
+
+    $this->get(route('books.index', ['year_from' => 1960, 'year_to' => 1969]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('books.data', 4)
+            ->where('filters.year_from', 1960)
+            ->where('filters.year_to', 1969));
+});

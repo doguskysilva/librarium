@@ -1,6 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import BookController from '@/actions/App/Http/Controllers/BookController';
+
+type BookFilters = {
+    category?: string;
+    language?: string;
+    filter?: string;
+    year_from?: number | string;
+    year_to?: number | string;
+};
 
 type Book = {
     id: string;
@@ -22,12 +31,46 @@ defineOptions({
     },
 });
 
-defineProps<{
+const props = defineProps<{
     books: {
         data: Book[];
         links: Array<{ url: string | null; label: string; active: boolean }>;
     };
+    filters: BookFilters;
 }>();
+
+const activeFilterLabels = computed(() => {
+    const labels: string[] = [];
+
+    if (props.filters.category) {
+        labels.push('Category');
+    }
+
+    if (props.filters.language) {
+        labels.push(`Language: ${props.filters.language}`);
+    }
+
+    if (props.filters.filter) {
+        labels.push(
+            {
+                missing_covers: 'Missing covers',
+                unclassified: 'Unclassified',
+                missing_isbn: 'Missing ISBN',
+                missing_descriptions: 'Missing descriptions',
+                unknown_language: 'Unknown language',
+                unknown_year: 'Unknown year',
+            }[props.filters.filter] ?? 'Filtered',
+        );
+    }
+
+    if (props.filters.year_from || props.filters.year_to) {
+        labels.push(
+            `Publication years: ${props.filters.year_from ?? 'Any'}–${props.filters.year_to ?? 'Any'}`,
+        );
+    }
+
+    return labels;
+});
 </script>
 
 <template>
@@ -39,6 +82,18 @@ defineProps<{
                 <h1 class="text-2xl font-semibold tracking-tight">Books</h1>
                 <p class="text-sm text-muted-foreground">
                     Catalog the physical editions in your library
+                </p>
+                <p
+                    v-if="activeFilterLabels.length"
+                    class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
+                >
+                    <span>Filtered by {{ activeFilterLabels.join(', ') }}</span>
+                    <Link
+                        :href="BookController.index.url()"
+                        class="font-medium text-foreground underline-offset-4 hover:underline"
+                    >
+                        Clear filters
+                    </Link>
                 </p>
             </div>
             <Link
@@ -90,7 +145,11 @@ defineProps<{
             v-else
             class="rounded-xl border border-dashed p-8 text-center text-muted-foreground"
         >
-            No books have been cataloged yet.
+            {{
+                activeFilterLabels.length
+                    ? 'No books match these filters.'
+                    : 'No books have been cataloged yet.'
+            }}
         </p>
 
         <nav v-if="books.links.length > 3" class="flex flex-wrap gap-2">
