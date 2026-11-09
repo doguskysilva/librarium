@@ -19,8 +19,9 @@ class BookController extends Controller
 {
     public function index(Request $request): Response
     {
-        /** @var array{category?: string, language?: string, filter?: string, year_from?: int, year_to?: int} $filters */
+        /** @var array{q?: string, category?: string, language?: string, filter?: string, year_from?: int, year_to?: int} $filters */
         $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:100'],
             'category' => ['nullable', 'uuid', 'exists:categories,id'],
             'language' => ['nullable', 'string', 'max:10'],
             'filter' => ['nullable', 'in:missing_covers,unclassified,missing_isbn,missing_descriptions,unknown_language,unknown_year'],
@@ -38,6 +39,14 @@ class BookController extends Controller
         $yearTo = $filters['year_to'] ?? null;
 
         $books = Book::query()
+            ->when(
+                $filters['q'] ?? null,
+                fn (Builder $query, string $search) => $query->where(
+                    fn (Builder $books) => $books
+                        ->where('title', 'like', '%'.$search.'%')
+                        ->orWhere('isbn', 'like', '%'.$search.'%'),
+                ),
+            )
             ->when(
                 $filters['category'] ?? null,
                 fn (Builder $query, string $categoryId) => $query->whereHas(

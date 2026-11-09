@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
@@ -6,6 +7,7 @@ import CategoryController from '@/actions/App/Http/Controllers/CategoryControlle
 import CollectionController from '@/actions/App/Http/Controllers/CollectionController';
 import ReadingController from '@/actions/App/Http/Controllers/ReadingController';
 import Heading from '@/components/Heading.vue';
+import BookMetadataLookupModal from '@/components/BookMetadataLookupModal.vue';
 import { Button } from '@/components/ui/button';
 
 type Book = {
@@ -18,6 +20,7 @@ type Book = {
     publication_year: number | null;
     language: string | null;
     description: string | null;
+    cover_url: string | null;
     authors: Relation[];
     categories: Relation[];
     collections: Relation[];
@@ -39,6 +42,7 @@ type Reading = {
 };
 
 defineProps<{ book: Book }>();
+const metadataModalOpen = ref(false);
 </script>
 
 <template>
@@ -52,6 +56,9 @@ defineProps<{ book: Book }>();
                 :description="book.subtitle ?? undefined"
             />
             <div class="flex gap-2">
+                <Button variant="outline" @click="metadataModalOpen = true">
+                    Compare metadata
+                </Button>
                 <Button as-child variant="outline">
                     <Link :href="ReadingController.create.url(book.id)"
                         >Add reading</Link
@@ -213,5 +220,11 @@ defineProps<{ book: Book }>();
                 No reading attempts yet.
             </p>
         </section>
+
+        <BookMetadataLookupModal
+            v-model:open="metadataModalOpen"
+            :initial-isbn="book.isbn"
+            :local-book="book"
+        />
     </div>
 </template>

@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'google_books' => [
+        'api_key' => env('GOOGLE_BOOKS_API_KEY'),
+    ],
+
+    'open_library' => [
+        'email' => env('OPEN_LIBRARY_EMAIL'),
+    ],
+
 ];

@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Actions\BookMetadata\FindBookMetadataByIsbn;
+use App\Services\BookMetadata\GoogleBooksProvider;
+use App\Services\BookMetadata\OpenLibraryProvider;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -15,7 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            FindBookMetadataByIsbn::class,
+            fn (Application $app): FindBookMetadataByIsbn => new FindBookMetadataByIsbn([
+                $app->make(GoogleBooksProvider::class),
+                $app->make(OpenLibraryProvider::class),
+            ]),
+        );
     }
 
     /**
