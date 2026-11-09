@@ -1,19 +1,11 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import {
-    BookOpen,
-    Folder,
-    FolderGit2,
-    LayoutGrid,
-    Tags,
-    UserRound,
-} from '@lucide/vue';
+import { BookOpen, Folder, LayoutGrid, Tags, UserRound } from '@lucide/vue';
 import AuthorController from '@/actions/App/Http/Controllers/AuthorController';
 import BookController from '@/actions/App/Http/Controllers/BookController';
 import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
 import CollectionController from '@/actions/App/Http/Controllers/CollectionController';
 import AppLogo from '@/components/AppLogo.vue';
-import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
 import {
@@ -55,19 +47,6 @@ const mainNavItems: NavItem[] = [
         icon: Folder,
     },
 ];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
 </script>
 
 <template>
@@ -89,7 +68,6 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
