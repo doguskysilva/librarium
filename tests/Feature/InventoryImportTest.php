@@ -248,6 +248,39 @@ test('proposed metadata fields are excluded even when the book record is verifie
     ]);
 });
 
+test('a supplied category slug is validated and imported instead of generating one', function () {
+    $document = inventoryDocument();
+    $document['categories'][0]['slug'] = 'algoritmos-e-computacao';
+
+    $report = app(InventoryImporter::class)->run($document, apply: true);
+
+    expect($report['records']['categories'][0]['action'])->toBe('create');
+
+    $this->assertDatabaseHas('categories', [
+        'name' => 'Computing',
+        'slug' => 'algoritmos-e-computacao',
+    ]);
+});
+
+test('duplicate supplied category slugs are reported without failing the apply', function () {
+    $document = inventoryDocument();
+    $document['categories'][] = [
+        'name' => 'Computer Science',
+        'slug' => 'shared-category-slug',
+        'description' => null,
+        'review_status' => 'verified',
+    ];
+    $document['categories'][0]['slug'] = 'shared-category-slug';
+
+    $report = app(InventoryImporter::class)->run($document, apply: true);
+
+    expect($report['records']['categories'][0]['action'])->toBe('create')
+        ->and($report['records']['categories'][1]['action'])->toBe('conflict');
+
+    $this->assertDatabaseCount('categories', 1);
+    $this->assertDatabaseHas('categories', ['slug' => 'shared-category-slug']);
+});
+
 test('verified translator fields and box set collections are imported', function () {
     $document = inventoryDocument();
     $document['collections'][0]['type'] = 'box_set';

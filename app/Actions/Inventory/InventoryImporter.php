@@ -121,6 +121,7 @@ class InventoryImporter
         }
 
         $plans = [];
+        $plannedCategorySlugs = [];
 
         foreach ($records as $index => $record) {
             $name = $record['name'];
@@ -151,13 +152,21 @@ class InventoryImporter
             $attributes = $this->entityAttributes($record, $entity, $fillableFields);
 
             if ($entity === 'categories' && $existing === null) {
-                $slugOwner = Category::query()->where('slug', $attributes['slug'])->first();
-
-                if ($slugOwner !== null && $this->normalizeName($slugOwner->name) !== $normalizedName) {
-                    $plans[] = $this->recordPlan($name, 'conflict', $index, reason: 'The generated category slug is already used by a different category.');
+                if (isset($plannedCategorySlugs[$attributes['slug']])) {
+                    $plans[] = $this->recordPlan($name, 'conflict', $index, reason: 'The category slug is already used by another category in this inventory.');
 
                     continue;
                 }
+
+                $slugOwner = Category::query()->where('slug', $attributes['slug'])->first();
+
+                if ($slugOwner !== null && $this->normalizeName($slugOwner->name) !== $normalizedName) {
+                    $plans[] = $this->recordPlan($name, 'conflict', $index, reason: 'The category slug is already used by a different catalog category.');
+
+                    continue;
+                }
+
+                $plannedCategorySlugs[$attributes['slug']] = true;
             }
 
             $missingAttributes = $existing === null
@@ -193,7 +202,7 @@ class InventoryImporter
         }
 
         if ($entity === 'categories') {
-            $attributes['slug'] = Str::slug($record['name']);
+            $attributes['slug'] = $record['slug'] ?? Str::slug($record['name']);
         }
 
         if ($entity === 'collections') {
