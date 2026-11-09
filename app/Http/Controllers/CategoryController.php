@@ -32,6 +32,8 @@ class CategoryController extends Controller
 
     public function show(Category $category): Response
     {
+        $category->load('books');
+
         return Inertia::render('categories/Show', ['category' => $category]);
     }
 

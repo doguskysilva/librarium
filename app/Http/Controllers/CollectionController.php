@@ -32,6 +32,8 @@ class CollectionController extends Controller
 
     public function show(Collection $collection): Response
     {
+        $collection->load('books');
+
         return Inertia::render('collections/Show', ['collection' => $collection]);
     }
 

@@ -31,6 +31,12 @@ class UpdateBookRequest extends FormRequest
             'language' => ['nullable', 'string', 'max:10'],
             'description' => ['nullable', 'string'],
             'cover_path' => ['nullable', 'string', 'max:2048'],
+            'author_ids' => ['nullable', 'array'],
+            'author_ids.*' => ['uuid', 'exists:authors,id'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['uuid', 'exists:categories,id'],
+            'collection_ids' => ['nullable', 'array'],
+            'collection_ids.*' => ['uuid', 'exists:collections,id'],
         ];
     }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
+import BookController from '@/actions/App/Http/Controllers/BookController';
 import CollectionController from '@/actions/App/Http/Controllers/CollectionController';
 import { Button } from '@/components/ui/button';
 
@@ -8,6 +9,12 @@ type Collection = {
     name: string;
     type: string;
     description: string | null;
+    books: BookSummary[];
+};
+
+type BookSummary = {
+    id: string;
+    title: string;
 };
 
 const typeLabels: Record<string, string> = {
@@ -51,5 +58,27 @@ defineProps<{ collection: Collection }>();
                 {{ collection.description ?? 'No description recorded.' }}
             </p>
         </div>
+
+        <section
+            class="rounded-xl border border-sidebar-border/70 p-6 dark:border-sidebar-border"
+        >
+            <h2 class="text-sm font-medium text-muted-foreground">Books</h2>
+            <div
+                v-if="collection.books.length"
+                class="mt-3 flex flex-col gap-2"
+            >
+                <Link
+                    v-for="book in collection.books"
+                    :key="book.id"
+                    :href="BookController.show.url(book.id)"
+                    class="font-medium hover:underline"
+                >
+                    {{ book.title }}
+                </Link>
+            </div>
+            <p v-else class="mt-3 text-sm text-muted-foreground">
+                No books assigned.
+            </p>
+        </section>
     </div>
 </template>

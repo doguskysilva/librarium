@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\Author;
 use App\Models\Book;
+use App\Models\Category;
+use App\Models\Collection;
 use App\Models\User;
 
 test('guests are redirected to the login page when visiting books', function () {
@@ -66,6 +69,34 @@ test('book creation requires a title', function () {
         ->assertRedirect(route('books.create'));
 
     $this->assertDatabaseCount('books', 0);
+});
+
+test('authenticated users can assign relationships when creating a book', function () {
+    $user = User::factory()->create();
+    $author = Author::factory()->create();
+    $category = Category::factory()->create();
+    $collection = Collection::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->post(route('books.store'), [
+            'title' => 'The Librarium Handbook',
+            'author_ids' => [$author->id],
+            'category_ids' => [$category->id],
+            'collection_ids' => [$collection->id],
+        ]);
+
+    $book = Book::query()->first();
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('books.show', $book));
+
+    $book->load(['authors', 'categories', 'collections']);
+
+    expect($book->authors->modelKeys())->toContain($author->id)
+        ->and($book->categories->modelKeys())->toContain($category->id)
+        ->and($book->collections->modelKeys())->toContain($collection->id);
 });
 
 test('book publication year cannot be in the future', function () {

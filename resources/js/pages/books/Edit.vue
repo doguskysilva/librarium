@@ -17,9 +17,22 @@ type Book = {
     publication_year: number | null;
     language: string | null;
     description: string | null;
+    authors: RelationOption[];
+    categories: RelationOption[];
+    collections: RelationOption[];
 };
 
-defineProps<{ book: Book }>();
+type RelationOption = {
+    id: string;
+    name: string;
+};
+
+defineProps<{
+    book: Book;
+    authors: RelationOption[];
+    categories: RelationOption[];
+    collections: RelationOption[];
+}>();
 
 defineOptions({
     layout: {
@@ -118,6 +131,83 @@ defineOptions({
                     class="min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 />
                 <InputError :message="errors.description" />
+            </div>
+
+            <div class="grid gap-6 md:grid-cols-3">
+                <div class="grid gap-2">
+                    <Label for="author_ids">Authors</Label>
+                    <select
+                        id="author_ids"
+                        name="author_ids[]"
+                        multiple
+                        size="5"
+                        class="min-h-32 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                    >
+                        <option
+                            v-for="author in authors"
+                            :key="author.id"
+                            :value="author.id"
+                            :selected="
+                                book.authors.some(
+                                    (item) => item.id === author.id,
+                                )
+                            "
+                        >
+                            {{ author.name }}
+                        </option>
+                    </select>
+                    <InputError :message="errors.author_ids" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="category_ids">Categories</Label>
+                    <select
+                        id="category_ids"
+                        name="category_ids[]"
+                        multiple
+                        size="5"
+                        class="min-h-32 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                    >
+                        <option
+                            v-for="category in categories"
+                            :key="category.id"
+                            :value="category.id"
+                            :selected="
+                                book.categories.some(
+                                    (item) => item.id === category.id,
+                                )
+                            "
+                        >
+                            {{ category.name }}
+                        </option>
+                    </select>
+                    <InputError :message="errors.category_ids" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="collection_ids">Collections</Label>
+                    <select
+                        id="collection_ids"
+                        name="collection_ids[]"
+                        multiple
+                        size="5"
+                        class="min-h-32 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                    >
+                        <option
+                            v-for="collection in collections"
+                            :key="collection.id"
+                            :value="collection.id"
+                            :selected="
+                                book.collections.some(
+                                    (item) => item.id === collection.id,
+                                )
+                            "
+                        >
+                            {{ collection.name }}
+                        </option>
+                    </select>
+                    <InputError :message="errors.collection_ids" />
+                </div>
             </div>
             <div class="flex gap-3">
                 <Button type="submit" :disabled="processing"
